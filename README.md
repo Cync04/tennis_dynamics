@@ -1,15 +1,11 @@
 # tennis_dynamics
 This project aims to compute tennis dynamics for (fill this in later)
 
-Absolutely — here’s a **README‑ready summary** rewritten so it refers to your file as **`aceserve_model`** instead of “this script” or “this file.”  
-It’s clean, concise, and perfect for teammates who need to understand what your component contributes.
-
 ---
 
 # **aceserve_model.py — Summary**
 
-`aceserve_model` builds a complete machine‑learning pipeline to analyze how serve characteristics influence point outcomes in professional tennis. It uses point‑level data from the 2024 Wimbledon Championships and produces both predictive models and visualizations.
-
+`aceserve_model` builds a complete machine‑learning pipeline to analyze how serve characteristics influence point outcomes in professional tennis.
 ### **What aceserve_model Does**
 
 #### **1. Data Cleaning & Preparation**
@@ -49,8 +45,4 @@ Each model includes:
 2. **Point‑Win Probability vs Serve Speed**  
 3. **Ace Probability vs Serve Speed (by Serve Width)**  
 
-These visualizations highlight how serve speed and serve width influence tactical outcomes.
-
 ---
-
-If you want, I can also generate a shorter one‑liner for the top of the README or a more formal “Methods” section for your final report.
