@@ -26,7 +26,7 @@ df["ServeNumber"] = pd.to_numeric(df["ServeNumber"], errors="coerce")
 df = df[df["ServeNumber"].notna()]
 df["ServeNumber"] = df["ServeNumber"].astype(int)
 
-# Clean ServeWidth (this column actually contains direction!)
+# Clean ServeWidth (contains direction)
 df["ServeWidth"] = df["ServeWidth"].astype(str).str.strip().str.upper()
 df = df[df["ServeWidth"].isin(["C", "BC", "B", "BW", "W"])]
 
