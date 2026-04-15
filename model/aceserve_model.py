@@ -200,7 +200,10 @@ plt.show()
 # =========================================================
 # 2. POINT‑WIN PROBABILITY VS SERVE SPEED
 # =========================================================
-speed_range = np.linspace(df["Speed_KMH"].min(), df["Speed_KMH"].max(), 200)
+min_speed = df["Speed_KMH"].quantile(0.01)
+max_speed = df["Speed_KMH"].quantile(0.99)
+
+speed_range = np.linspace(min_speed, max_speed, 200)
 speed_norm_range = (speed_range - df["Speed_KMH"].mean()) / df["Speed_KMH"].std()
 
 # Build temp DataFrame with ALL features used during training
@@ -227,6 +230,7 @@ plt.xlabel("Serve Speed (km/h)")
 plt.ylabel("Predicted Point‑Win Probability")
 plt.title("Point‑Win Probability vs Serve Speed (First Serve)")
 plt.grid(True)
+plt.xlim(100, max_speed)
 plt.show()
 
 # =========================================================
