@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tennis Point Dynamics</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <main class="page">
+    <h1>Tennis Point Dynamics</h1>
+    <p class="subtitle">Compare won vs lost points with trend lines across any numeric category.</p>
+
+    <section class="panel controls">
+      <label for="xColumn">X-axis category</label>
+      <select id="xColumn"></select>
+
+      <div class="filters-header">
+        <h2>Filters</h2>
+        <button id="addFilter" type="button">Add filter</button>
+      </div>
+
+      <div id="filters"></div>
+
+      <button id="applyBtn" type="button" class="apply">Apply</button>
+      <p class="hint">For "between", use: min,max. For "in", use comma-separated values.</p>
+
+      <section class="filter-help" aria-label="Filter help">
+        <h3>How Filters Work</h3>
+        <p>Each filter keeps only rows that match your condition. Multiple filters are combined with AND.</p>
+        <ul>
+          <li><strong>=</strong> exact match. Example: column <em>ServeIndicator</em>, value <em>1</em>.</li>
+          <li><strong>!=</strong> exclude an exact value.</li>
+          <li><strong>&gt;, &gt;=, &lt;, &lt;=</strong> numeric comparisons. Example: <em>Speed_MPH &gt; 120</em>.</li>
+          <li><strong>between</strong> numeric range using <em>min,max</em>. Example: <em>100,130</em>.</li>
+          <li><strong>contains</strong> text match inside a value.</li>
+          <li><strong>in</strong> one-of list using commas. Example: <em>C,BC,BW</em>.</li>
+        </ul>
+      </section>
+    </section>
+
+    <section class="panel output">
+      <div id="status" class="status">Loading...</div>
+      <img id="chart" alt="Win/Loss chart" />
+      <div id="summary" class="summary"></div>
+    </section>
+  </main>
+
+  <template id="filterTemplate">
+    <div class="filter-row">
+      <select class="filter-column"></select>
+      <select class="filter-op">
+        <option value="eq">=</option>
+        <option value="neq">!=</option>
+        <option value="gt">&gt;</option>
+        <option value="gte">&gt;=</option>
+        <option value="lt">&lt;</option>
+        <option value="lte">&lt;=</option>
+        <option value="between">between</option>
+        <option value="contains">contains</option>
+        <option value="in">in</option>
+      </select>
+      <input class="filter-value" type="text" placeholder="value" />
+      <button class="remove-filter" type="button">Remove</button>
+    </div>
+  </template>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+:root {
+  --bg: #f5f3eb;
+  --panel: #fffdf7;
+  --text: #1b1b1b;
+  --line: #d8d2bf;
+  --accent: #174c3c;
+  --accent-2: #b6472a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 85% 8%, #e4f1e9 0, transparent 35%),
+    radial-gradient(circle at 12% 30%, #f6dfce 0, transparent 45%),
+    var(--bg);
+}
+
+.page {
+  width: min(1100px, 94vw);
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1rem;
+}
+
+h1 {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 2rem;
+}
+
+.subtitle {
+  grid-column: 1 / -1;
+  margin: 0 0 0.5rem;
+  color: #3d3d3d;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
+}
+
+.controls label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+select,
+input,
+button {
+  width: 100%;
+  margin-bottom: 0.65rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
+.filters-header h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.filter-row {
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.apply,
+button {
+  background: white;
+  cursor: pointer;
+}
+
+.apply {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.remove-filter {
+  color: var(--accent-2);
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  min-height: 550px;
+}
+
+.status {
+  margin-bottom: 0.6rem;
+}
+
+.status.error {
+  color: #9d1f1f;
+  font-weight: 700;
+}
+
+#chart {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.summary {
+  margin-top: 0.7rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 0.3rem 1rem;
+}
+
+.hint {
+  color: #5a5a5a;
+  font-size: 0.85rem;
+}
+
+.filter-help {
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--line);
+}
+
+.filter-help h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.98rem;
+}
+
+.filter-help p {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  color: #3f3f3f;
+}
+
+.filter-help ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  color: #3f3f3f;
+}
+
+.filter-help li {
+  margin-bottom: 0.35rem;
+}
+
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .output {
+    min-height: auto;
+  }
+}
