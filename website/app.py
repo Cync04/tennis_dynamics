@@ -23,7 +23,7 @@ def _load_data() -> pd.DataFrame:
     df = pd.read_csv(DATA_PATH)
 
     # Keep only rows that represent actual served points with known winner/server.
-    df = df[(df["PointWinner"].isin([1, 2])) & (df["PointServer"].isin([1, 2]))].copy()
+    df = df[(df["PointWinner"].isin([1, 2])) & (df["PointServer"].isin([1, 2])) & (df["Speed_MPH"] != (0))].copy()
     df["is_won_by_server"] = (df["PointWinner"] == df["PointServer"]).astype(int)
 
     return df
