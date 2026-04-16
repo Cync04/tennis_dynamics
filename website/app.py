@@ -28,7 +28,9 @@ def _load_data() -> pd.DataFrame:
     # Keep only rows that represent actual served points with known winner/server.
     df = df[(df["PointWinner"].isin([1, 2])) & (df["PointServer"].isin([1, 2])) & (df["Speed_MPH"] != (0))].copy()
     df["is_won_by_server"] = (df["PointWinner"] == df["PointServer"]).astype(int)
-
+    df["Ace"] = pd.concat([df["P2Ace"], df["P1Ace"]], ignore_index=True)
+    df["BreakPoint"] = pd.concat([df["P2BreakPoint"], df["P1BreakPoint"]], ignore_index=True)
+    df = df.drop(columns=['P2Ace', 'P1Ace', 'P1BreakPoint', 'P2BreakPoint', 'PointWinner', 'PointServer'])
     return df
 
 
