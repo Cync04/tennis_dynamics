@@ -15,11 +15,17 @@ from sklearn.model_selection import cross_val_score
 df = pd.read_csv("../Project/2024-wimbledon-points.csv")
 print("Initial rows:", len(df))
 
-# Keep rows where Speed_KMH exists (but allow 0)
+# Clean Speed_KMH
+df["Speed_KMH"] = pd.to_numeric(df["Speed_KMH"], errors="coerce")
+
+# Remove fake 0 km/h speeds
+df.loc[df["Speed_KMH"] == 0, "Speed_KMH"] = np.nan
+
+# Keep only real speeds
 df = df[df["Speed_KMH"].notna()]
 
-# Keep realistic speeds but allow 0 for missing
-df = df[(df["Speed_KMH"] <= 240)]
+# Keep realistic upper bound
+df = df[df["Speed_KMH"] <= 240]
 
 # Clean ServeNumber safely
 df["ServeNumber"] = pd.to_numeric(df["ServeNumber"], errors="coerce")
@@ -230,7 +236,6 @@ plt.xlabel("Serve Speed (km/h)")
 plt.ylabel("Predicted Point‑Win Probability")
 plt.title("Point‑Win Probability vs Serve Speed (First Serve)")
 plt.grid(True)
-plt.xlim(100, max_speed)
 plt.show()
 
 # =========================================================
