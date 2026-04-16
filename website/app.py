@@ -20,7 +20,11 @@ DATA_PATH = Path(__file__).resolve().parent.parent / "Project" / "2024-wimbledon
 
 
 def _load_data() -> pd.DataFrame:
-    df = pd.read_csv(DATA_PATH)
+    df = pd.read_csv(DATA_PATH, usecols=["P2Ace","P1Ace", "Speed_MPH", "PointWinner", 
+                                         "PointServer", "Speed_KMH", "Rally", "P1DoubleFault", 
+                                         "P2DoubleFault", "P1BreakPoint", "P2BreakPoint", 
+                                         "ServeIndicator", "Serve_Direction", "ServingTo", 
+                                         "RallyCount", "ServeWidth", "ServeDepth", "ReturnDepth"])
 
     # Keep only rows that represent actual served points with known winner/server.
     df = df[(df["PointWinner"].isin([1, 2])) & (df["PointServer"].isin([1, 2])) & (df["Speed_MPH"] != (0))].copy()
