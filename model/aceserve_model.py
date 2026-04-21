@@ -4,6 +4,7 @@ matplotlib.use("Qt5Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
@@ -12,7 +13,11 @@ from sklearn.model_selection import cross_val_score
 # ---------------------------------------------------------
 # STEP 1 — LOAD & CLEAN DATASET
 # ---------------------------------------------------------
-df = pd.read_csv("../Project/2024-wimbledon-points.csv")
+df_2024 = pd.read_csv("Project/2024-wimbledon-points.csv")
+df_2023 = pd.read_csv("Project/2023-wimbledon-points.csv")
+df_2022 = pd.read_csv("Project/2022-wimbledon-points.csv")
+
+df = pd.concat([df_2024, df_2023, df_2022], ignore_index=True)
 print("Initial rows:", len(df))
 
 # Clean Speed_KMH
