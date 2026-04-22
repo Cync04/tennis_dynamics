@@ -39,12 +39,12 @@ DF = _load_data()
 
 def _column_meta(df: pd.DataFrame) -> list[dict[str, Any]]:
     meta: list[dict[str, Any]] = []
-
-    for col in df.columns:
+    df_new = df.drop(columns=['ServeIndicator'])
+    for col in df_new.columns:
         if col == "is_won_by_server":
             continue
 
-        series = df[col]
+        series = df_new[col]
         numeric_series = pd.to_numeric(series, errors="coerce")
         numeric_ratio = numeric_series.notna().mean()
 
@@ -331,6 +331,8 @@ def plot_data():
 
     if not x_column or x_column not in DF.columns:
         return jsonify({"error": "Invalid x_column"}), 400
+    if x_column == "ServeIndicator":
+        return jsonify({"error": "ServeIndicator cannot be used as an x-axis"}), 400
 
     if COLUMN_META_MAP.get(x_column, {}).get("type") != "numeric":
         return jsonify({"error": "x_column must be numeric"}), 400
