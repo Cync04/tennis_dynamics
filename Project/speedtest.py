@@ -1,4 +1,7 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import optimize
+import numpy as np
 
 def read_lines_pandas(filename, start_line, num_rows):
    
@@ -6,34 +9,54 @@ def read_lines_pandas(filename, start_line, num_rows):
         filename, 
         skiprows=start_line - 1, 
         nrows=num_rows, 
-        usecols= ["PointWinner","PointServer","Speed_MPH", "ServeIndicator"]
+        usecols= ["PointWinner","PointServer","Speed_MPH"]
     )
     return data
 
 
 
-df = read_lines_pandas('2024-wimbledon-points.csv', 1, 48000)
-print(df)
+df2024 = read_lines_pandas('2024-wimbledon-points.csv', 1, 48150)
+df2023 = read_lines_pandas('2023-wimbledon-points.csv', 1, 48677)
+df2022 = read_lines_pandas('2022-wimbledon-points.csv', 1, 46362)
 
-win1 = []
-loss1 = []
-win2 = []
-loss2 = []
+df = pd.concat([df2024, df2023, df2022], ignore_index=True)
 
+winData = dict()
 for point in range(len(df)):
-    if df.loc[point, "Speed_MPH"] == 0:
+    speed = df.loc[point, "Speed_MPH"]
+    if speed == 0:
         continue
     if df.loc[point, "PointWinner"] == df.loc[point, "PointServer"]:
-        if df.loc[point, "ServeIndicator"] == 1:
-            win1.append(df.loc[point, "Speed_MPH"])
+        if winData.get(speed) == None:
+            winData[speed] = [1, 0]
         else:
-            win2.append(df.loc[point, "Speed_MPH"])
+            winData[speed][0] += 1
     else:
-        if df.loc[point, "ServeIndicator"] == 1:
-            loss1.append(df.loc[point, "Speed_MPH"])
+        if winData.get(speed) == None:
+            winData[speed] = [0, 1]
         else:
-            loss2.append(df.loc[point, "Speed_MPH"])
-print("\nWon the point on first serve:", sum(win1)/len(win1))
-print("Won the point on second serve:", sum(win2)/len(win2))
-print("\nLost the point on first serve:", sum(loss1)/len(loss1))
-print("Lost the point on second serve:", sum(loss2)/len(loss2))
+            winData[speed][1] += 1
+
+x = np.array([])
+y = np.array([])
+sorted_dict = dict(sorted(winData.items()))
+for speedKey in sorted_dict.keys():
+    x = np.append(x, speedKey)
+    wins = sorted_dict[speedKey][0]
+    loss = sorted_dict[speedKey][1]
+    y = np.append(y, wins/(loss + wins)) 
+    
+def quadratic(x, a, b, c):
+    return a*x**2 + b*x + c
+dataSet, trash = optimize.curve_fit(quadratic, x, y)
+a, b, c = dataSet[:]
+
+# Creating graph
+plt.plot(x, y, label="Data")
+plt.plot(x, a*x**2 + b*x + c, label="Model")
+plt.title("Probability of Point Win Based on Serve Speed")
+plt.xlabel("Serve Speed (MPH)")
+plt.ylabel("Probability of Win")
+plt.legend(loc=2)
+plt.grid()
+plt.show()
