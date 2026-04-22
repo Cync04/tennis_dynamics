@@ -1,4 +1,5 @@
 :root {
+  /* Theme tokens used throughout the page. */
   --bg: #f5f3eb;
   --panel: #fffdf7;
   --text: #1b1b1b;
@@ -12,6 +13,7 @@
 }
 
 body {
+  /* Layered soft gradients keep the page from feeling flat. */
   margin: 0;
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   color: var(--text);
@@ -22,6 +24,7 @@ body {
 }
 
 .page {
+  /* Two-column desktop layout: controls + output. */
   width: min(1100px, 94vw);
   margin: 2rem auto;
   display: grid;
@@ -42,6 +45,7 @@ h1 {
 }
 
 .panel {
+  /* Reusable card container for both controls and chart output. */
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -53,6 +57,20 @@ h1 {
   display: block;
   font-weight: 600;
   margin-bottom: 0.4rem;
+}
+
+.metric-badge {
+  /* Small pill that highlights recommended y-axis metric. */
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  background: #e7f4ed;
+  border: 1px solid #c5e5d4;
+  color: #13553f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
 }
 
 select,
@@ -79,10 +97,15 @@ button {
 }
 
 .filter-row {
+  /* Individual filter row card added dynamically via JavaScript. */
   border: 1px dashed var(--line);
   border-radius: 8px;
   padding: 0.5rem;
   margin-bottom: 0.6rem;
+}
+
+.hidden {
+  display: none;
 }
 
 .apply,
@@ -103,6 +126,7 @@ button {
 }
 
 .output {
+  /* Chart panel grows vertically to keep image readable. */
   display: flex;
   flex-direction: column;
   min-height: 550px;
@@ -117,6 +141,23 @@ button {
   font-weight: 700;
 }
 
+.progress-wrap {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #ece7d6;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  margin: 0.15rem 0 0.75rem;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #2f7c62, #174c3c);
+  transition: width 180ms ease;
+}
+
 #chart {
   width: 100%;
   border-radius: 10px;
@@ -125,6 +166,7 @@ button {
 }
 
 .summary {
+  /* Compact metric grid under the chart. */
   margin-top: 0.7rem;
   display: grid;
   grid-template-columns: repeat(2, minmax(140px, 1fr));
@@ -165,6 +207,7 @@ button {
 }
 
 @media (max-width: 900px) {
+  /* Mobile: collapse to single-column flow. */
   .page {
     grid-template-columns: 1fr;
   }

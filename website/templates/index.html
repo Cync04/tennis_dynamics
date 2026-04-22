@@ -8,23 +8,31 @@
 </head>
 <body>
   <main class="page">
+    <!-- Page header and high-level purpose. -->
     <h1>Tennis Point Dynamics</h1>
-    <p class="subtitle">Compare won vs lost points with trend lines across any numeric category.</p>
+    <p class="subtitle">Explore how match factors affect outcomes, defaulting to percent chance of winning.</p>
 
     <section class="panel controls">
+      <!-- Axis controls: pick what to compare and what to measure. -->
       <label for="xColumn">X-axis category</label>
       <select id="xColumn"></select>
+
+      <label for="yMetric">Y-axis metric <span id="yMetricBadge" class="metric-badge"></span></label>
+      <select id="yMetric"></select>
+      <p id="yMetricNote" class="hint"></p>
 
       <div class="filters-header">
         <h2>Filters</h2>
         <button id="addFilter" type="button">Add filter</button>
       </div>
 
+      <!-- Dynamic filter rows are injected here from app.js. -->
       <div id="filters"></div>
 
       <button id="applyBtn" type="button" class="apply">Apply</button>
       <p class="hint">For "between", use: min,max. For "in", use comma-separated values.</p>
 
+      <!-- Inline help to clarify operator behavior and input format. -->
       <section class="filter-help" aria-label="Filter help">
         <h3>How Filters Work</h3>
         <p>Each filter keeps only rows that match your condition. Multiple filters are combined with AND.</p>
@@ -40,12 +48,17 @@
     </section>
 
     <section class="panel output">
+      <!-- Server-rendered chart image and computed summary statistics. -->
       <div id="status" class="status">Loading...</div>
+      <div id="progressWrap" class="progress-wrap hidden" aria-label="Chart render progress">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
       <img id="chart" alt="Win/Loss chart" />
       <div id="summary" class="summary"></div>
     </section>
   </main>
 
+  <!-- Template cloned for each new filter row. -->
   <template id="filterTemplate">
     <div class="filter-row">
       <select class="filter-column"></select>
@@ -61,6 +74,7 @@
         <option value="in">in</option>
       </select>
       <input class="filter-value" type="text" placeholder="value" />
+      <select class="filter-value-select hidden"></select>
       <button class="remove-filter" type="button">Remove</button>
     </div>
   </template>
