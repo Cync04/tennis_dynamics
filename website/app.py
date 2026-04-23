@@ -71,7 +71,7 @@ def _load_data() -> pd.DataFrame:
 DF = _load_data()
 
 # Hide these fields from filter selection controls.
-FILTER_EXCLUDED_COLUMNS = {"Serve_Direction"}
+FILTER_EXCLUDED_COLUMNS = {"Serve_Direction", "PointWinner", "PointServer"}
 
 
 def _column_meta(df: pd.DataFrame) -> list[dict[str, Any]]:
