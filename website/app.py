@@ -62,13 +62,16 @@ def _load_data() -> pd.DataFrame:
     df["Ace"] = np.where(df["PointServer"] == 1, df["P1Ace"], df["P2Ace"])
     df["BreakPoint"] = np.where(df["PointServer"] == 1, df["P2BreakPoint"], df["P1BreakPoint"])
 
-    # Hide player-specific ace columns from analysis UI after creating merged Ace.
-    df = df.drop(columns=["P1Ace", "P2Ace"])
+    # Hide player-specific columns after creating merged features.
+    df = df.drop(columns=["P1Ace", "P2Ace", "P1BreakPoint", "P2BreakPoint"])
 
     return df
 
 
 DF = _load_data()
+
+# Hide these fields from filter selection controls.
+FILTER_EXCLUDED_COLUMNS = {"Serve_Direction"}
 
 
 def _column_meta(df: pd.DataFrame) -> list[dict[str, Any]]:
@@ -77,6 +80,8 @@ def _column_meta(df: pd.DataFrame) -> list[dict[str, Any]]:
     # ServeIndicator remains filterable but hidden from x-axis selections.
     df_new = df.drop(columns=['ServeIndicator'])
     for col in df_new.columns:
+        if col in FILTER_EXCLUDED_COLUMNS:
+            continue
         if col == "is_won_by_server":
             continue
 
@@ -145,12 +150,27 @@ Y_METRICS = [
         "description": "Total observed points at each x-value.",
         "outcome_based": False,
     },
+    {
+        "id": "ace_pct",
+        "label": "Ace percentage",
+        "description": "The percent chance of making an ace",
+        "outcome_based": True,
+    },
+    {
+        "id": "rally_count",
+        "label": "Rally Count",
+        "description": "The amount of rallies that happened on that point",
+        "outcome_based": True,
+    }
 ]
 
 Y_METRIC_MAP = {item["id"]: item for item in Y_METRICS}
 
 # For these x-columns, outcome metrics are tautological and not analytically useful.
 OUTCOME_INCOMPATIBLE_X_COLUMNS = {"Ace"}
+
+# Hide these numeric fields from x-axis selection in the UI.
+X_AXIS_EXCLUDED_COLUMNS = {"ServeIndicator", "Ace", "RallyCount", "BreakPoint"}
 
 
 def _allowed_y_metric_ids_for_x(x_column: str) -> list[str]:
@@ -320,6 +340,8 @@ def _build_plot(df: pd.DataFrame, x_column: str, y_metric: str) -> tuple[str, di
     x = pd.to_numeric(df[x_column], errors="coerce")
     work = df.copy()
     work["x"] = x
+    work["ace_numeric"] = pd.to_numeric(work["Ace"], errors="coerce")
+    work["rally_numeric"] = pd.to_numeric(work["RallyCount"], errors="coerce")
     work = work.dropna(subset=["x"]) 
 
     if work.empty:
@@ -331,17 +353,39 @@ def _build_plot(df: pd.DataFrame, x_column: str, y_metric: str) -> tuple[str, di
     if unique_count > 80:
         bins = np.linspace(work["x"].min(), work["x"].max(), 31)
         work["x_bucket"] = pd.cut(work["x"], bins=bins, include_lowest=True)
-        grouped = work.groupby("x_bucket", observed=True)["is_won_by_server"].agg(["sum", "count"]).reset_index()
+        grouped = (
+            work.groupby("x_bucket", observed=True)
+            .agg(
+                won_count=("is_won_by_server", "sum"),
+                total_points=("is_won_by_server", "count"),
+                ace_made=("ace_numeric", "sum"),
+                ace_points=("ace_numeric", "count"),
+                rally_sum=("rally_numeric", "sum"),
+                rally_points=("rally_numeric", "count"),
+            )
+            .reset_index()
+        )
         grouped["x_value"] = grouped["x_bucket"].apply(lambda interval: interval.mid if pd.notna(interval) else np.nan)
     else:
-        grouped = work.groupby("x", observed=True)["is_won_by_server"].agg(["sum", "count"]).reset_index()
+        grouped = (
+            work.groupby("x", observed=True)
+            .agg(
+                won_count=("is_won_by_server", "sum"),
+                total_points=("is_won_by_server", "count"),
+                ace_made=("ace_numeric", "sum"),
+                ace_points=("ace_numeric", "count"),
+                rally_sum=("rally_numeric", "sum"),
+                rally_points=("rally_numeric", "count"),
+            )
+            .reset_index()
+        )
         grouped = grouped.rename(columns={"x": "x_value"})
 
-    grouped["won_count"] = grouped["sum"]
-    grouped["lost_count"] = grouped["count"] - grouped["sum"]
-    grouped["total_points"] = grouped["count"]
+    grouped["lost_count"] = grouped["total_points"] - grouped["won_count"]
     # Default analytic metric: empirical win probability at each x-value.
     grouped["win_pct"] = np.where(grouped["total_points"] > 0, (grouped["won_count"] / grouped["total_points"]) * 100.0, np.nan)
+    grouped["ace_pct"] = np.where(grouped["ace_points"] > 0, (grouped["ace_made"] / grouped["ace_points"]) * 100.0, np.nan)
+    grouped["rally_count"] = np.where(grouped["rally_points"] > 0, grouped["rally_sum"] / grouped["rally_points"], np.nan)
     grouped = grouped.dropna(subset=["x_value"]).sort_values("x_value")
 
     fig, ax = plt.subplots(figsize=(10, 5.5))
@@ -415,7 +459,11 @@ def index() -> str:
 @app.get("/api/meta")
 def get_meta():
     # Frontend bootstrap endpoint (columns, y metrics, defaults, compatibility).
-    numeric_columns = [m["name"] for m in COLUMN_META if m["type"] == "numeric" and m["name"] != "ServeIndicator"]
+    numeric_columns = [
+        m["name"]
+        for m in COLUMN_META
+        if m["type"] == "numeric" and m["name"] not in X_AXIS_EXCLUDED_COLUMNS
+    ]
     y_metrics_with_compatibility = []
     for metric in Y_METRICS:
         compatible_x = [col for col in numeric_columns if metric["id"] in _allowed_y_metric_ids_for_x(col)]
@@ -430,6 +478,7 @@ def get_meta():
 
     return jsonify({
         "columns": COLUMN_META,
+        "x_columns": numeric_columns,
         "default_x": "Speed_MPH" if "Speed_MPH" in numeric_columns else numeric_columns[0],
         "y_metrics": y_metrics_with_compatibility,
         "default_y": "win_pct",
@@ -447,8 +496,8 @@ def plot_data():
 
     if not x_column or x_column not in DF.columns:
         return jsonify({"error": "Invalid x_column"}), 400
-    if x_column == "ServeIndicator":
-        return jsonify({"error": "ServeIndicator cannot be used as an x-axis"}), 400
+    if x_column in X_AXIS_EXCLUDED_COLUMNS:
+        return jsonify({"error": f"{x_column} cannot be used as an x-axis"}), 400
 
     if COLUMN_META_MAP.get(x_column, {}).get("type") != "numeric":
         return jsonify({"error": "x_column must be numeric"}), 400

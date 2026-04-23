@@ -19,6 +19,8 @@ let yMetricMap = {};
 let progressTimer = null;
 let isRendering = false;
 
+const X_AXIS_CLIENT_EXCLUSIONS = new Set(['ServeIndicator', 'Ace', 'RallyCount']);
+
 // Operators offered when a filter column is numeric.
 const NUMERIC_OPS = [
   { value: 'eq', label: '=' },
@@ -336,9 +338,14 @@ async function init() {
     yMetrics = meta.y_metrics || [];
     yMetricMap = Object.fromEntries(yMetrics.map((metric) => [metric.id, metric]));
 
-    const numeric = columns.filter((c) => c.type === 'numeric');
-    numeric.forEach((col) => {
-      xSelect.appendChild(makeOption(col.name, col.name));
+    const xColumnNames = (meta.x_columns && meta.x_columns.length > 0)
+      ? meta.x_columns
+      : columns
+          .filter((c) => c.type === 'numeric' && !X_AXIS_CLIENT_EXCLUSIONS.has(c.name))
+          .map((c) => c.name);
+
+    xColumnNames.forEach((name) => {
+      xSelect.appendChild(makeOption(name, name));
     });
 
     if (meta.default_x) {
