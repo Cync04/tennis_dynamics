@@ -89,6 +89,14 @@ print("Final rows after cleaning + server perspective:", len(df))
 
 # One-hot encode ServeWidth (C, BC, B, BW, W)
 width_dummies = pd.get_dummies(df["ServeWidth"], prefix="width")
+rename_Map = {
+    "width_C": "width_T",
+    "width_BC": "width_Body",
+    "width_B": "width_Bucket",
+    "width_BW": "width_Corner",
+    "width_W": "width_Wide"
+}
+width_dummies = width_dummies.rename(columns=rename_Map)
 df = pd.concat([df, width_dummies], axis=1)
 
 # Encode serve number
