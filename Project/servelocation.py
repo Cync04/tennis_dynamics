@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def read_lines_pandas(filename, start_line, num_rows):
    
@@ -12,8 +13,11 @@ def read_lines_pandas(filename, start_line, num_rows):
 
 
 
-df = read_lines_pandas('2024-wimbledon-points.csv', 1, 48000)
-print(df)
+df2024 = read_lines_pandas('2024-wimbledon-points.csv', 1, 48150)
+df2023 = read_lines_pandas('2023-wimbledon-points.csv', 1, 48677)
+df2022 = read_lines_pandas('2022-wimbledon-points.csv', 1, 46362)
+
+df = pd.concat([df2024, df2023, df2022], ignore_index=True)
 
 c = 0
 c2 = 0
@@ -29,42 +33,41 @@ count1 = 0
 count2 = 0
 
 for point in range(len(df)):
-    if df.loc[point, "ServeWidth"] == "":
+    location = df.loc[point, "ServeWidth"]
+    if location == "":
         continue
     count1 += 1
     if df.loc[point, "PointWinner"] == df.loc[point, "PointServer"]:
         
-        if df.loc[point, "ServeWidth"] == "C":
+        if location == "C":
             c += 1
-        elif df.loc[point, "ServeWidth"] == "BC":
+        elif location == "BC":
             bc += 1
-        elif df.loc[point, "ServeWidth"] == "B":
+        elif location == "B":
             b += 1
-        elif df.loc[point, "ServeWidth"] == "BW":
+        elif location == "BW":
             bw += 1
-        elif df.loc[point, "ServeWidth"] == "W":
+        elif location == "W":
             w += 1
     else:
         
-        if df.loc[point, "ServeWidth"] == "C":
+        if location == "C":
             c2 += 1
-        elif df.loc[point, "ServeWidth"] == "BC":
+        elif location == "BC":
             bc2 += 1
-        elif df.loc[point, "ServeWidth"] == "B":
+        elif location == "B":
             b2 += 1
-        elif df.loc[point, "ServeWidth"] == "BW":
+        elif location == "BW":
             bw2 += 1
-        elif df.loc[point, "ServeWidth"] == "W":
+        elif location == "W":
             w2 += 1
 
-print(f"Percent of points served to center: {((c+c2)/count1)*100:.1f}")
-print(f"Percent of points served to body-center: {((bc+bc2)/count1)*100:.1f}")
-print(f"Percent of points served to body: {((b+b2)/count1)*100:.1f}")
-print(f"Percent of points served to body-wide: {((bw+bw2)/count1)*100:.1f}")
-print(f"Percent of points served to wide: {((w+w2)/count1)*100:.1f}\n")
+positions = ["W", "BW", "B", "BC", "C"]
+heights = [(w/(w+w2))*100, (bw/(bw+bw2))*100, (b/(b+b2))*100, (bc/(bc+bc2))*100, (c/(c+c2))*100]
 
-print(f"Percent of points won at center: {(c/(c+c2))*100:.1f}")
-print(f"Percent of points won at body-center: {(bc/(bc+bc2))*100:.1f}")
-print(f"Percent of points won at body: {(b/(b+b2))*100:.1f}")
-print(f"Percent of points won at body-wide: {(bw/(bw+bw2))*100:.1f}")
-print(f"Percent of points won at wide: {(w/(w+w2))*100:.1f}")
+plt.ylim(40, 100)
+plt.bar(positions, heights)
+plt.ylabel("Percent Chance of Winning")
+plt.xlabel("Serve Location")
+plt.title("Actual Chance of Winning")
+plt.show()
