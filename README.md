@@ -6,6 +6,11 @@ The project includes:
 - Exploratory scripts for quick statistics (serve speed, serve location, ace rates)
 - A machine learning pipeline that predicts ace probability and server point-win probability
 - A Flask web app for interactive filtering and plotting of won vs lost point trends
+- Link to our presentation
+
+## Project Presentation Link
+
+- https://youtu.be/9nO38lWX0IY
 
 ## Project Structure
 
